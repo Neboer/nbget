@@ -1,6 +1,4 @@
-#ifndef NBPET_ARRANGER_H
-#define NBPET_ARRANGER_H
-
+#pragma once
 #include "task.h"
 #include <queue>
 #include <list>
@@ -17,4 +15,3 @@ void initialize_task_list(string filename, string download_address);
 
 void message_loop(const string& filename, const string& download_address, curl_off_t file_length);
 
-#endif //NBPET_ARRANGER_H

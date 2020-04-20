@@ -32,8 +32,8 @@ struct proxy_and_speed {
     curl_off_t last_download_speed;
 };
 
-void cover_or_trim_task(proxy_and_speed proxy_and_speed_info, list<Task>::iterator task, string filename,
-                        string download_address) {
+void cover_or_trim_task(const proxy_and_speed& proxy_and_speed_info, list<Task>::iterator task, const string& filename,
+                        const string& download_address) {
     if (proxy_and_speed_info.last_download_speed * EXPECT_DOWNLOAD_TIME_SEC + task->start > task->end) {
         // 重新分配这个task并立即开始下载
         *task = Task(proxy_and_speed_info.proxy_server, task->start, task->end);

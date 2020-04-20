@@ -1,11 +1,9 @@
-#ifndef NBPET_TASK_H
-#define NBPET_TASK_H
+#pragma once
 
 #include <curl/curl.h>
 #include <thread>
 
 #include "string"
-#include "http.h"
 
 #define STATUS_CREATE 0
 #define STATUS_RUNNING 1
@@ -20,6 +18,8 @@ extern int global_task_id;
 struct proxy {
     string address;
     int index;
+    bool operator== (const proxy &rhs) const;
+
 };
 
 class Task {
@@ -30,7 +30,7 @@ public:
     curl_off_t end;
     curl_off_t download;
     short status;
-    unique_ptr<thread> taskThread;
+    thread* taskThread{};
     curl_off_t speed;
 
     Task(proxy proxy_info, curl_off_t start, curl_off_t end);
@@ -39,9 +39,8 @@ public:
 
     void execute(const string &fileName, const string &download_address);
 
-    void wait();
+    void wait() const;
+
+    bool operator== (const Task &rhs) const;
 
 };
-
-
-#endif //NBPET_TASK_H

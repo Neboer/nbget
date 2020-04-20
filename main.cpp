@@ -2,6 +2,7 @@
 #include "task.h"
 #include "arranger.h"
 #include "progress.h"
+#include "http.h"
 #include <vector>
 #include <string>
 
@@ -20,6 +21,7 @@ argument parser(int argc, char **argv) {
             string(argv[argc - 1])
 
     };
+    return argument;
 }
 
 int main(int argc, char **argv) {
