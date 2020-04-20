@@ -13,6 +13,6 @@ using namespace std;
 
 void part_download(const string &download_address, const string &file_name, Task *task);
 
-curl_off_t get_file_size(char *download_address);
+curl_off_t get_file_size(const char *download_address);
 
 #endif //NBPET_HTTP_H

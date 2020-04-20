@@ -3,4 +3,4 @@ project(nbpet)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(nbpet main.cpp task.cpp task.h http.cpp http.h arranger.cpp arranger.h)
+add_executable(nbpet main.cpp task.cpp http.cpp arranger.cpp progress.cpp)

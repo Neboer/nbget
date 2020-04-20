@@ -1,6 +1,7 @@
 #include <iostream>
 #include "task.h"
 #include "arranger.h"
+#include "progress.h"
 #include <vector>
 #include <string>
 
@@ -25,5 +26,10 @@ int main(int argc, char **argv) {
     argument args = parser(argc, argv);
     initialize_proxy_list(args.proxy_list, args.proxy_count);
     initialize_task_list(args.file_name, args.download_address);
-    
+    curl_off_t file_length = get_file_size(args.download_address.c_str());
+    start_progress_thread(file_length);
+    message_loop(args.file_name, args.download_address, file_length);
+    for (Task &task:globalTaskList) {
+        task.wait();
+    }
 }

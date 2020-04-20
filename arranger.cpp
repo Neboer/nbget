@@ -1,4 +1,5 @@
 #include "arranger.h"
+#include <unistd.h>
 
 #define TEST_DOWNLOAD_BYTES 0xFFFFFF // 16M is enough
 #define EXPECT_DOWNLOAD_TIME_SEC 30
@@ -6,6 +7,7 @@
 queue<int> taskMessageQueue;
 list<Task> globalTaskList;
 list<proxy> globalProxyList;
+pthread_mutex_t tpListLock;
 
 void initialize_proxy_list(char **proxies_str_list, int count) {
     for (int i = 0; i < count; i++) {
@@ -54,17 +56,20 @@ void cover_or_trim_task(proxy_and_speed proxy_and_speed_info, list<Task>::iterat
 
 
 // the main message loop for listening to progress complete event.
-void message_loop(string filename, string download_address, curl_off_t file_length) {
+void message_loop(const string &filename, const string &download_address, curl_off_t file_length) {
     int task_id;
     // pending proxy server是空闲的代理服务器列表。
     queue<proxy_and_speed> pending_proxy_servers;
     while (true) {
         if (!taskMessageQueue.empty()) {
+            // 直接加锁了，不废话。
+            pthread_mutex_lock(&tpListLock);
             task_id = taskMessageQueue.front();
             taskMessageQueue.pop();
             for (auto task = globalTaskList.begin(); task != globalTaskList.end(); task++) {
                 if (task->task_id == task_id) {
                     if (task->status == STATUS_ERROR) {
+                        // 下载出错，删去有问题的代理服务器，并尝试从空闲的代理中拿到新的来下载这块数据。
                         globalProxyList.remove(task->use_proxy);
                         if (!pending_proxy_servers.empty()) {
                             proxy_and_speed useful_proxy = pending_proxy_servers.front();
@@ -107,7 +112,9 @@ void message_loop(string filename, string download_address, curl_off_t file_leng
                     }
                 }
             }
+            pthread_mutex_unlock(&tpListLock);
         }
         loop_end:;
+        usleep(20);
     }
 }

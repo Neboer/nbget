@@ -58,7 +58,7 @@ static size_t header_callback(char *buffer, size_t size, size_t nitems, curl_off
     return nitems * size;
 }
 
-curl_off_t get_file_size(char *download_address) {
+curl_off_t get_file_size(const char *download_address) {
     CURL *curl = curl_easy_init();
     curl_off_t total_file_length;
     curl_easy_setopt(curl, CURLOPT_URL, download_address);
