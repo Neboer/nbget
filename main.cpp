@@ -1,13 +1,29 @@
 #include <iostream>
 #include "task.h"
+#include "arranger.h"
 #include <vector>
 #include <string>
 
+struct argument {
+    char **proxy_list;
+    int proxy_count;
+    string download_address;
+    string file_name;
+};
 
+argument parser(int argc, char **argv) {
+    argument argument = {
+            argv + 2,
+            argc - 3,
+            string(argv[1]),
+            string(argv[argc - 1])
 
-int main() {
-    Task task1 = Task(string("proxy1"), 0, 10, proxy(__cxx11::basic_string(), 0));
-    Task task2 = Task(string("proxy2"), 10, 20, proxy(__cxx11::basic_string(), 0));
-    vector<Task> task_list = {task1, task2};
-    cout << task_list.at(0).speed;
+    };
+}
+
+int main(int argc, char **argv) {
+    argument args = parser(argc, argv);
+    initialize_proxy_list(args.proxy_list, args.proxy_count);
+    initialize_task_list(args.file_name, args.download_address);
+    
 }

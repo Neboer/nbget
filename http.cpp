@@ -35,7 +35,7 @@ void part_download(const string &download_address, const string &file_name, Task
         task->status = STATUS_COMPLETE;
         curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD_T, &(task->speed));
     }
-    taskMessageQueue.push(*task);
+    taskMessageQueue.push(task->task_id);
     curl_easy_cleanup(curl);
 }
 
@@ -53,7 +53,7 @@ static size_t header_callback(char *buffer, size_t size, size_t nitems, curl_off
     head_data[nitems - 2] = 0;
     char *head_occur_position = strstr(head_data, "content-length: ");
     if (head_occur_position) {
-        *userdata = strtoull(head_occur_position + sizeof("content-length: ") - 1, nullptr, 0);
+        *userdata = strtol(head_occur_position + sizeof("content-length: ") - 1, nullptr, 0);
     }
     return nitems * size;
 }

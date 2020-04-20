@@ -15,6 +15,8 @@
 
 using namespace std;
 
+extern int global_task_id;
+
 struct proxy {
     string address;
     int index;
@@ -22,15 +24,18 @@ struct proxy {
 
 class Task {
 public:
+    int task_id;
     proxy use_proxy;
     curl_off_t start;
     curl_off_t end;
     curl_off_t download;
     short status;
-    thread taskThread;
+    unique_ptr<thread> taskThread;
     curl_off_t speed;
 
     Task(proxy proxy_info, curl_off_t start, curl_off_t end);
+
+    Task(curl_off_t start, curl_off_t end, short status);
 
     void execute(const string &fileName, const string &download_address);
 

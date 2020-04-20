@@ -2,9 +2,18 @@
 #define NBPET_ARRANGER_H
 
 #include "task.h"
-#include <vector>
 #include <queue>
+#include <list>
 
 using namespace std;
-extern queue<Task> taskMessageQueue;
+extern queue<int> taskMessageQueue;
+extern list<Task> globalTaskList;
+extern list<proxy> globalProxyList;
+
+void initialize_proxy_list(char **proxies_str_list, int count);
+
+void initialize_task_list(string filename, string download_address);
+
+void message_loop(string filename, string download_address, curl_off_t file_length);
+
 #endif //NBPET_ARRANGER_H
