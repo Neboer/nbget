@@ -8,6 +8,7 @@ extern queue<Task*> taskMessageQueue;
 extern list<Task*> globalTaskList;
 extern list<proxy> globalProxyList;
 extern pthread_mutex_t tpListLock;
+extern pthread_mutex_t messageLock;
 
 void initialize_proxy_list(char **proxies_str_list, int count);
 

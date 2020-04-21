@@ -26,17 +26,32 @@ void show_progress(curl_off_t file_length) {
     while (total_download < file_length) {
         total_download = 0;
         pthread_mutex_lock(&tpListLock);
-        int proxy_count = globalProxyList.size();
+        int active = 0;
         for (Task* task:globalTaskList) {
             total_download += task->download;
+            if(task->status == STATUS_RUNNING){
+                active++;
+            }
         }
         pthread_mutex_unlock(&tpListLock);
-        cerr << "workers: " << proxy_count << "current speed: " << humanSize(total_download - last_download) << "/s "
-             << setprecision(4) << (float) total_download / (float) file_length * 100 << "%\r";
+        cerr << "workers: " << active << "current speed: " << humanSize(total_download - last_download) << "/s "
+             << setprecision(4) << (float) total_download / (float) file_length * 100 << "% " << total_download << " " << globalTaskList.back()->end  <<  "\r";
         last_download = total_download;
         sleep(1);
     }
 }
+
+//void show_progress_(curl_off_t file_length){
+//    while (true){
+//        cerr << "\r";
+//        pthread_mutex_lock(&tpListLock);
+//        for(Task* task:globalTaskList){
+//            cerr << task->start << "-" << task->end << " ";
+//        }
+//        pthread_mutex_unlock(&tpListLock);
+//        sleep(1);
+//    }
+//}
 
 void start_progress_thread(curl_off_t file_length) {
     new thread(show_progress, file_length);

@@ -18,6 +18,7 @@ extern int global_task_id;
 struct proxy {
     string address;
     int index;
+    curl_off_t speed = -1;
 
     bool operator==(const proxy &rhs) const;
 
@@ -43,6 +44,8 @@ struct Task {
     void execute(const string fileName, const string download_address);
 
     void wait();
+
+    curl_off_t length();
 
     bool operator==(const Task &rhs) = delete;
 };

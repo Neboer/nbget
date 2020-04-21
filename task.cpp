@@ -30,6 +30,10 @@ Task::Task(curl_off_t start, curl_off_t end, short status) {
     this->taskThread = thread();
 }
 
+curl_off_t Task::length() {
+    return end - start;
+}
+
 void Task::execute(const string fileName, const string download_address) {
     this->status = STATUS_RUNNING;
     this->taskThread = thread(part_download, download_address, fileName, this);

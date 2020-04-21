@@ -35,7 +35,9 @@ void part_download(const string download_address, const string file_name, Task *
         task->status = STATUS_COMPLETE;
         curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD_T, &(task->speed));
     }
+    pthread_mutex_lock(&messageLock);
     taskMessageQueue.push(task);
+    pthread_mutex_unlock(&messageLock);
     curl_easy_cleanup(curl);
 }
 
@@ -66,6 +68,5 @@ curl_off_t get_file_size(const char *download_address) {
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, &total_file_length);
     curl_easy_perform(curl);
-    fputs("body request\n", stderr);
     return total_file_length;
 }
