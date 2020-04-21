@@ -6,7 +6,7 @@
 #include "task.h"
 #include "arranger.h"
 
-#define LOWEST_SPEED_BPS 10
+#define LOWEST_SPEED_BPS 30000
 using namespace std;
 
 void part_download(const string download_address, const string file_name, Task *task);

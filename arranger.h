@@ -7,6 +7,7 @@ using namespace std;
 extern queue<Task*> taskMessageQueue;
 extern list<Task*> globalTaskList;
 extern list<proxy> globalProxyList;
+extern queue<proxy> pending_proxy_servers;// pending proxy server是空闲的代理服务器列表。
 extern pthread_mutex_t tpListLock;
 extern pthread_mutex_t messageLock;
 
