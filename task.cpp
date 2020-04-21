@@ -9,7 +9,7 @@ int global_task_id = 0;
 Task::Task(proxy proxy_info, curl_off_t start, curl_off_t end) {
     this->task_id = global_task_id;
     global_task_id++;
-    this->use_proxy = proxy_info;
+    this->proxy_server = proxy_info;
     this->start = start;
     this->end = end;
     download = 0;
@@ -21,25 +21,22 @@ Task::Task(proxy proxy_info, curl_off_t start, curl_off_t end) {
 Task::Task(curl_off_t start, curl_off_t end, short status) {
     this->task_id = global_task_id;
     global_task_id++;
-    this->use_proxy = proxy();
+    this->proxy_server = proxy();
     this->start = start;
     this->end = end;
     download = 0;
     this->status = status;
     speed = 0;
-    this->taskThread = nullptr;
+    this->taskThread = thread();
 }
 
-void Task::execute(const string &fileName, const string &download_address) {
-    this->taskThread = new thread(part_download, download_address, fileName, this);
+void Task::execute(const string fileName, const string download_address) {
+    this->status = STATUS_RUNNING;
+    this->taskThread = thread(part_download, download_address, fileName, this);
 }
 
-void Task::wait() const {
-    this->taskThread->join();
-}
-
-bool Task::operator==(const Task &rhs) const {
-    return rhs.task_id == task_id;
+void Task::wait() {
+    this->taskThread.join();
 }
 
 bool proxy::operator==(const proxy &rhs) const {

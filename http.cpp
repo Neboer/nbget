@@ -6,7 +6,7 @@ int progress_callback(Task *task, curl_off_t dltotal, curl_off_t now_download_si
     return 0;
 }
 
-void part_download(const string &download_address, const string &file_name, Task *task) {
+void part_download(const string download_address, const string file_name, Task *task) {
     // rb+ explanation: open in this mode, the file won't get destroyed. But it requires a long enough file in advance.
     FILE *file = fopen(file_name.c_str(), "rb+");
     // fseeko can take larger param as position up to 64 bytes integer.
@@ -16,7 +16,7 @@ void part_download(const string &download_address, const string &file_name, Task
     char range_string[60]; // maybe 60 is just enough...
     sprintf(range_string, "%ld-%ld", task->start, task->end);
     curl_easy_setopt(curl, CURLOPT_RANGE, range_string);
-    curl_easy_setopt(curl, CURLOPT_PROXY, task->use_proxy.address.c_str());
+    curl_easy_setopt(curl, CURLOPT_PROXY, task->proxy_server.address.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
     curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
     // warning: the download will abort when meet low speed problem.
@@ -35,7 +35,7 @@ void part_download(const string &download_address, const string &file_name, Task
         task->status = STATUS_COMPLETE;
         curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD_T, &(task->speed));
     }
-    taskMessageQueue.push(task->task_id);
+    taskMessageQueue.push(task);
     curl_easy_cleanup(curl);
 }
 

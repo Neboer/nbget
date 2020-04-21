@@ -18,29 +18,31 @@ extern int global_task_id;
 struct proxy {
     string address;
     int index;
-    bool operator== (const proxy &rhs) const;
+
+    bool operator==(const proxy &rhs) const;
 
 };
 
-class Task {
-public:
+struct Task {
     int task_id;
-    proxy use_proxy;
+    proxy proxy_server;
     curl_off_t start;
     curl_off_t end;
     curl_off_t download;
     short status;
-    thread* taskThread{};
+    thread taskThread;
     curl_off_t speed;
 
     Task(proxy proxy_info, curl_off_t start, curl_off_t end);
 
     Task(curl_off_t start, curl_off_t end, short status);
 
-    void execute(const string &fileName, const string &download_address);
+    // a task object cannot be compared with or copy.
+    Task(Task &task) = delete;
 
-    void wait() const;
+    void execute(const string fileName, const string download_address);
 
-    bool operator== (const Task &rhs) const;
+    void wait();
 
+    bool operator==(const Task &rhs) = delete;
 };

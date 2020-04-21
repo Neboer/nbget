@@ -24,14 +24,15 @@ void show_progress(curl_off_t file_length) {
     curl_off_t total_download = 0;
     curl_off_t last_download = 0;
     while (total_download < file_length) {
+        total_download = 0;
         pthread_mutex_lock(&tpListLock);
         int proxy_count = globalProxyList.size();
-        for (Task &task:globalTaskList) {
-            total_download += task.download;
+        for (Task* task:globalTaskList) {
+            total_download += task->download;
         }
         pthread_mutex_unlock(&tpListLock);
         cerr << "workers: " << proxy_count << "current speed: " << humanSize(total_download - last_download) << "/s "
-             << setprecision(1) << (float) total_download / (float) file_length << "%\r";
+             << setprecision(4) << (float) total_download / (float) file_length * 100 << "%\r";
         last_download = total_download;
         sleep(1);
     }
