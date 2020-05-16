@@ -1,12 +1,13 @@
 #include "http.h"
 
-int progress_callback(Task *task, curl_off_t dltotal, curl_off_t now_download_size, curl_off_t ultotal,
-                      curl_off_t ulnow) {
+int progress_callback(Task *task, [[maybe_unused]] curl_off_t dltotal, curl_off_t now_download_size,
+                      [[maybe_unused]] curl_off_t ultotal, [[maybe_unused]] curl_off_t ulnow) {
     task->download = now_download_size;
     return 0;
 }
 
-void part_download(const string download_address, const string file_name, Task *task) {
+void
+part_download(const string &download_address, const string &file_name, Task *task, queue<Task *> *taskMessageQueue) {
     // rb+ explanation: open in this mode, the file won't get destroyed. But it requires a long enough file in advance.
     FILE *file = fopen(file_name.c_str(), "rb+");
     // fseeko can take larger param as position up to 64 bytes integer.
@@ -36,7 +37,7 @@ void part_download(const string download_address, const string file_name, Task *
         curl_easy_getinfo(curl, CURLINFO_SPEED_DOWNLOAD_T, &(task->speed));
     }
     pthread_mutex_lock(&messageLock);
-    taskMessageQueue.push(task);
+    taskMessageQueue->push(task);
     pthread_mutex_unlock(&messageLock);
     curl_easy_cleanup(curl);
 }
@@ -60,13 +61,15 @@ static size_t header_callback(char *buffer, size_t size, size_t nitems, curl_off
     return nitems * size;
 }
 
-curl_off_t get_file_size(const char *download_address) {
+curl_off_t get_file_size(const string &download_address, const string &proxy) {
     CURL *curl = curl_easy_init();
     curl_off_t total_file_length;
-    curl_easy_setopt(curl, CURLOPT_URL, download_address);
+    curl_easy_setopt(curl, CURLOPT_URL, download_address.c_str());
     curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, &total_file_length);
+    curl_easy_setopt(curl, CURLOPT_PROXY, proxy.c_str());
     curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
     return total_file_length;
 }

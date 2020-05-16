@@ -20,28 +20,29 @@ static const char *humanSize(curl_off_t bytes) {
     return output;
 }
 
-void show_progress(curl_off_t file_length) {
+void show_progress(curl_off_t file_length, download_status *global_download_status) {
     curl_off_t total_download = 0;
     curl_off_t last_download = 0;
     while (total_download < file_length) {
         total_download = 0;
         pthread_mutex_lock(&tpListLock);
         int active = 0;
-        for (Task* task:globalTaskList) {
+        for (Task *task:global_download_status->globalTaskList) {
             total_download += task->download;
-            if(task->status == STATUS_RUNNING){
+            if (task->status == STATUS_RUNNING) {
                 active++;
             }
         }
         pthread_mutex_unlock(&tpListLock);
         cerr << "workers: " << active << "current speed: " << humanSize(total_download - last_download) << "/s "
-             << setprecision(4) << (float) total_download / (float) file_length * 100 << "% " << total_download << " " << globalTaskList.back()->end  <<  "\r";
+             << setprecision(4) << (float) total_download / (float) file_length * 100 << "% " << total_download << " "
+             << global_download_status->globalTaskList.back()->end << "     " << "\r";
         last_download = total_download;
         sleep(1);
     }
 }
 
-//void show_progress_(curl_off_t file_length){
+//void show_progress(curl_off_t file_length){
 //    while (true){
 //        cerr << "\r";
 //        pthread_mutex_lock(&tpListLock);
@@ -53,6 +54,6 @@ void show_progress(curl_off_t file_length) {
 //    }
 //}
 
-void start_progress_thread(curl_off_t file_length) {
-    new thread(show_progress, file_length);
+void start_progress_thread(curl_off_t file_length, download_status *status) {
+    new thread(show_progress, file_length, status);
 }

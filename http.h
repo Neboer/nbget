@@ -1,4 +1,5 @@
 #pragma once
+
 #include <curl/curl.h>
 #include <string>
 #include <cstdio>
@@ -6,9 +7,10 @@
 #include "task.h"
 #include "arranger.h"
 
-#define LOWEST_SPEED_BPS 30000
+#define LOWEST_SPEED_BPS 100
 using namespace std;
 
-void part_download(const string download_address, const string file_name, Task *task);
+void
+part_download(const string &download_address, const string &file_name, Task *task, queue<Task *> *taskMessageQueue);
 
-curl_off_t get_file_size(const char *download_address);
+curl_off_t get_file_size(const string &download_address, const string &proxy);

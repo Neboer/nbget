@@ -2,6 +2,7 @@
 
 #include <curl/curl.h>
 #include <thread>
+#include <queue>
 
 #include "string"
 
@@ -21,7 +22,6 @@ struct proxy {
     curl_off_t speed = -1;
 
     bool operator==(const proxy &rhs) const;
-
 };
 
 struct Task {
@@ -41,11 +41,11 @@ struct Task {
     // a task object cannot be compared with or copy.
     Task(Task &task) = delete;
 
-    void execute(const string fileName, const string download_address);
+    void execute(const string &fileName, const string &download_address, queue<Task *> *taskMessageQueue);
 
     void wait();
 
-    curl_off_t length();
+    curl_off_t length() const;
 
     bool operator==(const Task &rhs) = delete;
 };
